@@ -1,5 +1,10 @@
 # Session Todo
 
+![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)
+![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift)
+![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
+[![MIT License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+
 ## TL;DR — try it
 
 On a Mac running macOS 13 or newer (Apple Silicon or Intel):
