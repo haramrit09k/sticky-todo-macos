@@ -1,5 +1,7 @@
 # Session Todo
 
+<img src="Assets/AppIcon.png" width="120" alt="Sticky Todo app icon">
+
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift)
 ![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
