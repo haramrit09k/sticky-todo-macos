@@ -2,6 +2,7 @@
 .build/
 .cache/
 outputs/
+work/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 DerivedData/

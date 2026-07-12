@@ -5,7 +5,7 @@ ROOT="${0:A:h}"
 APP="$ROOT/outputs/Session Todo.app"
 CONTENTS="$APP/Contents"
 
-mkdir -p "$CONTENTS/MacOS"
+mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources"
 mkdir -p "$ROOT/.cache/clang"
 CLANG_MODULE_CACHE_PATH="$ROOT/.cache/clang" \
 swiftc -O \
@@ -15,6 +15,7 @@ swiftc -O \
   -framework ServiceManagement \
   "$ROOT/Sources/SessionTodo/main.swift" \
   -o "$CONTENTS/MacOS/SessionTodo"
+cp "$ROOT/Assets/AppIcon.icns" "$CONTENTS/Resources/AppIcon.icns"
 
 cat > "$CONTENTS/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -24,6 +25,7 @@ cat > "$CONTENTS/Info.plist" <<'PLIST'
   <key>CFBundleIdentifier</key><string>local.sessiontodo</string>
   <key>CFBundleName</key><string>Session Todo</string>
   <key>CFBundleDisplayName</key><string>Session Todo</string>
+  <key>CFBundleIconFile</key><string>AppIcon.icns</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>LSUIElement</key><true/>
