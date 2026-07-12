@@ -1,5 +1,10 @@
 # Session Todo
 
+![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)
+![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift)
+![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
+[![MIT License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+
 ## TL;DR — try it
 
 On a Mac running macOS 13 or newer (Apple Silicon or Intel):
@@ -9,6 +14,8 @@ git clone https://github.com/haramrit09k/sticky-todo-macos.git && cd sticky-todo
 ```
 
 That builds the app locally, puts it in `/Applications`, and opens it. Press `⌘⇧Space` anytime to hide or bring it back.
+
+**Quick start:** add one small task, work from the card marked **NOW**, and check it off when you are done. [See the short usage guide →](#how-to-use-it)
 
 I made this because I kept opening a task, getting distracted by something else, and then forgetting what I had originally sat down to do.
 
