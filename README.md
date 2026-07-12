@@ -2,7 +2,7 @@
 
 ## TL;DR — try it
 
-On an Apple Silicon Mac running macOS 13 or newer:
+On a Mac running macOS 13 or newer (Apple Silicon or Intel):
 
 ```bash
 git clone https://github.com/haramrit09k/sticky-todo-macos.git && cd sticky-todo-macos && ./install.sh
@@ -71,7 +71,7 @@ If you would rather not install it yet:
 open "outputs/Session Todo.app"
 ```
 
-The build currently targets Apple Silicon Macs. I have not packaged or notarized a downloadable release yet.
+The build script compiles for the Mac it runs on, so it works on both Apple Silicon and Intel Macs. I have not packaged or notarized a downloadable universal release yet.
 
 ## How to use it
 
