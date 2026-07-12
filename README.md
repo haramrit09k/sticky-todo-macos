@@ -1,57 +1,49 @@
 # Session Todo
 
-A small, local-only macOS focus widget for keeping the current session's next task visible—without turning productivity into another project.
+I made this because I kept opening a task, getting distracted by something else, and then forgetting what I had originally sat down to do.
 
-Session Todo is built for people who get pulled into rabbit holes, lose track of their original intention, or feel overwhelmed by a large task manager. It keeps one task visually dominant, hides the backlog until requested, and offers gentle focus check-ins.
+Session Todo is a small floating todo list for macOS. It is not meant to replace Things, Reminders, Linear, or whatever you use for planning. It is just for the current work session—the handful of things you are actually trying to get done right now.
 
-## The problem it solves
+The first unfinished task stays visually obvious. Everything else can be tucked away until you need it.
 
-Traditional todo apps are excellent for planning, but they can be too heavy for answering a simpler question:
+## Why this exists
 
-> What was I supposed to be doing right now?
+Most todo apps are good at storing work. I wanted something better at reminding me what I was doing five minutes ago.
 
-Session Todo creates a lightweight boundary between planning and doing. It helps you:
+The problem usually looks like this:
 
-- Recover your intention after getting distracted.
-- Keep one next action visible without staring at an entire project backlog.
-- Capture a task quickly without organizing tags, dates, projects, or priorities.
-- Notice a distraction loop through optional, low-frequency nudges.
-- Return to the list from anywhere with one keyboard shortcut.
+1. Start working on something.
+2. Open a browser to look up one small detail.
+3. End up six tabs deep in a completely different problem.
+4. Eventually wonder what I was supposed to be doing.
 
-It deliberately avoids accounts, cloud sync, streaks, analytics, and complicated productivity systems.
+This app leaves the answer one shortcut away.
 
-## Features
+## What it does
 
-- One visually prominent **NOW** task.
-- Collapsible backlog for keeping later work out of sight.
-- Global `⌘⇧Space` shortcut to show or hide the widget.
-- Menu-bar access when the window is hidden.
-- Inline task editing: click the task text or pencil, then press Return to save.
-- Checkbox-only completion to prevent accidental task completion.
-- Drag-and-drop task reordering when the backlog is expanded.
-- Arrow control as an accessible reordering fallback.
-- Five-second Undo after completing, deleting, editing, or reordering.
-- Optional silent focus nudges at randomized 20–35 minute intervals.
-- A **Got distracted** notification action that restores the widget.
-- Optional launch at login.
-- Local persistence through macOS `UserDefaults`.
-- No network requests, accounts, telemetry, or sync.
+- Keeps one **NOW** task front and center.
+- Hides the rest of the backlog unless you ask to see it.
+- Opens or hides with `⌘⇧Space` from anywhere on the Mac.
+- Lives in the menu bar when the window is hidden.
+- Lets you edit a task directly by clicking its text.
+- Lets you drag tasks to reorder them (expand the backlog first).
+- Gives you a few seconds to undo an accidental edit, delete, reorder, or completion.
+- Can send an occasional silent nudge asking if you are still on the current task.
+- Stores everything locally. No account and no sync.
 
-## Requirements
+There are intentionally no projects, labels, due dates, streaks, productivity scores, or dashboards.
 
-- macOS 13 Ventura or later.
-- Apple Silicon Mac. The included build script currently creates an `arm64` app using the active Swift toolchain.
-- Xcode Command Line Tools or Xcode.
+## Install
 
-Install the command-line tools if needed:
+For now, Session Todo is built from source. You need macOS 13 or newer and Xcode Command Line Tools.
+
+If you do not have the command-line tools yet:
 
 ```bash
 xcode-select --install
 ```
 
-## Install from source
-
-Clone and build:
+Then clone and install the app:
 
 ```bash
 git clone https://github.com/haramrit09k/session-todo.git
@@ -60,81 +52,66 @@ chmod +x build.sh install.sh
 ./install.sh
 ```
 
-The installer builds an ad-hoc-signed app, copies it to `/Applications/Session Todo.app`, and opens it.
+That builds the app, copies it to `/Applications/Session Todo.app`, and opens it.
 
-You can also build without installing:
+If you would rather not install it yet:
 
 ```bash
 ./build.sh
 open "outputs/Session Todo.app"
 ```
 
-## Using Session Todo
+The build currently targets Apple Silicon Macs. I have not packaged or notarized a downloadable release yet.
 
-1. Type a small, concrete next step and press Return.
-2. Work from the task marked **NOW**.
-3. Click the checkbox when it is complete.
-4. Use **Show later** to reveal the backlog.
-5. Drag tasks to reorder them, or use the upward arrow.
-6. Click task text to edit it in place. Press Return to save or Escape to cancel.
-7. Press `⌘⇧Space` from any app to hide or restore the widget.
+## How to use it
 
-The `×` button hides the window without quitting. Use `⌘Q` or the menu-bar menu to quit completely.
+Type a concrete next step and press Return. Smaller tasks work better than vague ones—“write the intro paragraph” is more useful than “finish website.”
 
-## Gentle nudges
+- Click the checkbox to complete a task.
+- Click the task text or pencil to edit it. Return saves; Escape cancels.
+- Expand **Show later** to see the backlog.
+- Drag a task card to reorder it, or use the small up arrow.
+- Press `⌘⇧Space` to hide or bring back the window.
+- The `×` hides the window. It does not quit the app.
+- Use `⌘Q` or the menu-bar menu when you actually want to quit.
 
-When enabled, Session Todo sends a silent check-in at a randomized interval between 20 and 35 minutes, but only when an unfinished task exists.
+## Nudges
 
-The notification asks whether you are still working on the current task:
+The optional nudge feature sends a silent notification at a random point between 20 and 35 minutes, as long as you have an unfinished task.
 
-- **Yep** dismisses the check-in.
-- **Got distracted** restores Session Todo and focuses the input.
+It asks whether you are still working on the current task. **Yep** dismisses it. **Got distracted** brings the window back.
 
-Nudges can be enabled or disabled from the checkmark icon in the macOS menu bar. macOS notification permission is required.
+I made the timing slightly random because a perfectly predictable reminder is very easy to dismiss without thinking. That said, notifications can also become noise, so nudges can be turned off from the checkmark icon in the menu bar.
 
 ## Launch at login
 
-Open the checkmark menu-bar menu and enable **Launch at login**. macOS may require the app to be installed in `/Applications` before it can register as a login item.
+There is a **Launch at login** toggle in the menu-bar menu. Install the app in `/Applications` before enabling it; macOS may reject login-item registration for a build running from another folder.
 
 ## Privacy
 
-Session Todo is intentionally local-only.
+Tasks are saved with macOS `UserDefaults` on your own computer. The app does not make network requests and does not include analytics or telemetry.
 
-- Tasks are stored in macOS `UserDefaults` on your computer.
-- The app does not connect to the internet.
-- There is no account, sync service, analytics SDK, or telemetry.
-- Notifications are created locally by macOS.
+Notifications are scheduled locally by macOS.
 
-## Development
+## Building / hacking on it
 
-The app is a small native Swift/AppKit project with no third-party dependencies.
+This is a deliberately small native Swift/AppKit app. There are no third-party dependencies.
 
 ```bash
 ./build.sh
 ```
 
-The script:
+The main code is in `Sources/SessionTodo/main.swift`. The build script compiles it with `swiftc`, creates the `.app` bundle in `outputs/`, and applies an ad-hoc signature.
 
-1. Compiles `Sources/SessionTodo/main.swift` with `swiftc`.
-2. Creates a standard macOS `.app` bundle under `outputs/`.
-3. Writes the bundle metadata.
-4. Applies an ad-hoc code signature.
+The app uses:
 
-Main frameworks:
+- AppKit for the UI and floating window
+- Carbon for the global shortcut
+- UserNotifications for the focus check-ins
+- ServiceManagement for launch at login
 
-- AppKit for the interface and floating panel.
-- Carbon for the global keyboard shortcut.
-- UserNotifications for focus nudges.
-- ServiceManagement for launch-at-login support.
-
-## Design principles
-
-- **One thing first:** the current task gets the strongest visual treatment.
-- **Progressive disclosure:** later tasks remain hidden until requested.
-- **Low shame:** nudges are neutral check-ins, not streaks or warnings.
-- **Fast recovery:** one global shortcut brings the original intention back.
-- **Minimal administration:** no projects, labels, due dates, or setup ceremony.
+The code is still fairly compact and a little scrappy in places. Issues and small improvements are welcome.
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
