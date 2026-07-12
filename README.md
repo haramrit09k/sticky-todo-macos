@@ -46,8 +46,8 @@ xcode-select --install
 Then clone and install the app:
 
 ```bash
-git clone https://github.com/haramrit09k/session-todo.git
-cd session-todo
+git clone https://github.com/haramrit09k/sticky-todo-macos.git
+cd sticky-todo-macos
 chmod +x build.sh install.sh
 ./install.sh
 ```
