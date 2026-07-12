@@ -1,5 +1,15 @@
 # Session Todo
 
+## TL;DR — try it
+
+On an Apple Silicon Mac running macOS 13 or newer:
+
+```bash
+git clone https://github.com/haramrit09k/sticky-todo-macos.git && cd sticky-todo-macos && ./install.sh
+```
+
+That builds the app locally, puts it in `/Applications`, and opens it. Press `⌘⇧Space` anytime to hide or bring it back.
+
 I made this because I kept opening a task, getting distracted by something else, and then forgetting what I had originally sat down to do.
 
 Session Todo is a small floating todo list for macOS. It is not meant to replace Things, Reminders, Linear, or whatever you use for planning. It is just for the current work session—the handful of things you are actually trying to get done right now.
