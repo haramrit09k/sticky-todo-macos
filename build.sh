@@ -5,6 +5,9 @@ ROOT="${0:A:h}"
 APP="$ROOT/outputs/Session Todo.app"
 CONTENTS="$APP/Contents"
 
+# Always assemble a fresh bundle. Reusing an app that Finder has touched can
+# leave metadata behind that ad-hoc signing correctly refuses to accept.
+rm -rf "$APP"
 mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources"
 mkdir -p "$ROOT/.cache/clang"
 CLANG_MODULE_CACHE_PATH="$ROOT/.cache/clang" \
