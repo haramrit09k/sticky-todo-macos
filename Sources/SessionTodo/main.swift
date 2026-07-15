@@ -71,6 +71,24 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         return store.items.firstIndex(where: { !$0.isDone }).map { [$0] } ?? []
     }
 
+    func pivotToTask(named rawTitle: String) {
+        let title = rawTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+
+        if let existingIndex = store.items.firstIndex(where: {
+            !$0.isDone && $0.title.compare(title, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+        }) {
+            let existing = store.items.remove(at: existingIndex)
+            store.items.insert(existing, at: 0)
+        } else {
+            store.items.insert(Todo(id: UUID(), title: title, isDone: false), at: 0)
+        }
+
+        store.save()
+        table.reloadData()
+        updateCount()
+    }
+
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 540, height: 520))
         view.wantsLayer = true
@@ -696,9 +714,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         let yes = UNNotificationAction(identifier: "ON_TRACK", title: "Still on it", options: [])
-        let distracted = UNNotificationAction(identifier: "DISTRACTED", title: "Bring me back", options: [.foreground])
+        let distracted = UNNotificationAction(identifier: "DISTRACTED", title: "Got distracted", options: [.foreground])
+        let switching = UNTextInputNotificationAction(
+            identifier: "SWITCH_TASK",
+            title: "Working on something else\u{2026}",
+            options: [],
+            textInputButtonTitle: "Switch focus",
+            textInputPlaceholder: "What are you working on?"
+        )
         center.setNotificationCategories([
-            UNNotificationCategory(identifier: "FOCUS_CHECK", actions: [yes, distracted], intentIdentifiers: [])
+            UNNotificationCategory(identifier: "FOCUS_CHECK", actions: [yes, distracted, switching], intentIdentifiers: [])
         ])
         nudgeMenuItem.state = nudgesEnabled ? .on : .off
         guard nudgesEnabled else { return }
@@ -760,6 +785,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
+        if response.actionIdentifier == "SWITCH_TASK",
+           let textResponse = response as? UNTextInputNotificationResponse {
+            Task { @MainActor in
+                (self.panel.contentViewController as? TodoViewController)?.pivotToTask(named: textResponse.userText)
+                completionHandler()
+            }
+            return
+        }
         if response.actionIdentifier == "DISTRACTED" || response.actionIdentifier == UNNotificationDefaultActionIdentifier {
             Task { @MainActor in self.showPanel() }
         }
