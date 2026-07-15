@@ -695,8 +695,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private func configureNudges() {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
-        let yes = UNNotificationAction(identifier: "ON_TRACK", title: "Yep", options: [])
-        let distracted = UNNotificationAction(identifier: "DISTRACTED", title: "Got distracted", options: [.foreground])
+        let yes = UNNotificationAction(identifier: "ON_TRACK", title: "Still on it", options: [])
+        let distracted = UNNotificationAction(identifier: "DISTRACTED", title: "Bring me back", options: [.foreground])
         center.setNotificationCategories([
             UNNotificationCategory(identifier: "FOCUS_CHECK", actions: [yes, distracted], intentIdentifiers: [])
         ])
@@ -724,9 +724,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard let data = UserDefaults.standard.data(forKey: "sessionTodos"),
               let todos = try? JSONDecoder().decode([Todo].self, from: data),
               let current = todos.first(where: { !$0.isDone }) else { return }
+
+        let copy: (title: String, body: String)
+        switch Int.random(in: 0..<5) {
+        case 0:
+            copy = ("Rabbit-hole radar \u{1F407}", "Is \u{201C}\(current.title)\u{201D} still the mission?")
+        case 1:
+            copy = ("Tiny compass check \u{2728}", "Still heading toward \u{201C}\(current.title)\u{201D}?")
+        case 2:
+            copy = ("Psst\u{2026} your task is waving", "Making a little progress on \u{201C}\(current.title)\u{201D}?")
+        case 3:
+            copy = ("Plot check!", "Did the plot wander away from \u{201C}\(current.title)\u{201D}?")
+        default:
+            copy = ("A gentle todo boop", "Current quest: \u{201C}\(current.title)\u{201D}. Still with it?")
+        }
+
         let content = UNMutableNotificationContent()
-        content.title = "Quick focus check"
-        content.body = "Still working on: “\(current.title)”?"
+        content.title = copy.title
+        content.body = copy.body
         content.categoryIdentifier = "FOCUS_CHECK"
         content.sound = nil
         UNUserNotificationCenter.current().add(
