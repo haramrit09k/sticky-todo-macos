@@ -52,6 +52,11 @@ final class TodoStore {
 
 @MainActor
 final class TodoViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate {
+    private enum DisplayRow: Equatable {
+        case task(Int)
+        case completedHeader
+    }
+
     private let taskDragType = NSPasteboard.PasteboardType("local.sessiontodo.task-row")
     private let store = TodoStore()
     private let table = NSTableView()
@@ -62,13 +67,27 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
     private let backlogButton = NSButton()
     private let undoButton = NSButton(title: "Undo", target: nil, action: nil)
     private var isExpanded = false
+    private var isCompletedExpanded = false
     private var editingIndex: Int?
     private var undoSnapshot: [Todo]?
     private var undoTimer: Timer?
 
-    private var displayedIndices: [Int] {
-        if isExpanded { return Array(store.items.indices) }
-        return store.items.firstIndex(where: { !$0.isDone }).map { [$0] } ?? []
+    private var displayedRows: [DisplayRow] {
+        guard isExpanded else {
+            return store.items.firstIndex(where: { !$0.isDone }).map { [.task($0)] } ?? []
+        }
+
+        var rows = store.items.indices
+            .filter { !store.items[$0].isDone }
+            .map(DisplayRow.task)
+        let completed = store.items.indices.filter { store.items[$0].isDone }
+        if !completed.isEmpty {
+            rows.append(.completedHeader)
+            if isCompletedExpanded {
+                rows.append(contentsOf: completed.map(DisplayRow.task))
+            }
+        }
+        return rows
     }
 
     func pivotToTask(named rawTitle: String) {
@@ -253,11 +272,19 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         ])
     }
 
-    func numberOfRows(in tableView: NSTableView) -> Int { displayedIndices.count }
+    func numberOfRows(in tableView: NSTableView) -> Int { displayedRows.count }
+
+    func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
+        guard displayedRows.indices.contains(row) else { return table.rowHeight }
+        return displayedRows[row] == .completedHeader ? 44 : table.rowHeight
+    }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard displayedIndices.indices.contains(row) else { return nil }
-        let itemIndex = displayedIndices[row]
+        guard displayedRows.indices.contains(row) else { return nil }
+        if displayedRows[row] == .completedHeader {
+            return makeCompletedHeader()
+        }
+        guard case let .task(itemIndex) = displayedRows[row] else { return nil }
         let item = store.items[itemIndex]
         let firstOpenRow = store.items.firstIndex(where: { !$0.isDone })
         let isNow = itemIndex == firstOpenRow
@@ -362,7 +389,7 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         up.contentTintColor = .tertiaryLabelColor
         up.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
         up.toolTip = "Make this task sooner"
-        up.isHidden = !isExpanded || itemIndex == 0
+        up.isHidden = !isExpanded || item.isDone || itemIndex == firstOpenRow
         up.translatesAutoresizingMaskIntoConstraints = false
 
         let remove = NSButton(title: "×", target: self, action: #selector(removeTask(_:)))
@@ -405,6 +432,35 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         return cell
     }
 
+    private func makeCompletedHeader() -> NSView {
+        let container = NSView()
+        let count = store.items.filter(\.isDone).count
+        let symbol = isCompletedExpanded ? "chevron.down" : "chevron.right"
+        let disclosure = NSButton(
+            image: NSImage(systemSymbolName: symbol, accessibilityDescription: "Toggle completed tasks")!,
+            target: self,
+            action: #selector(toggleCompleted)
+        )
+        disclosure.title = "Completed (\(count))"
+        disclosure.imagePosition = .imageLeading
+        disclosure.imageHugsTitle = true
+        disclosure.isBordered = false
+        disclosure.alignment = .left
+        disclosure.font = .systemFont(ofSize: 13, weight: .semibold)
+        disclosure.contentTintColor = .secondaryLabelColor
+        disclosure.toolTip = isCompletedExpanded ? "Hide completed tasks" : "Show completed tasks"
+        disclosure.translatesAutoresizingMaskIntoConstraints = false
+
+        container.addSubview(disclosure)
+        NSLayoutConstraint.activate([
+            disclosure.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 18),
+            disclosure.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: -18),
+            disclosure.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            disclosure.heightAnchor.constraint(equalToConstant: 32)
+        ])
+        return container
+    }
+
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if commandSelector == #selector(NSResponder.insertNewline(_:)) {
             if control === input { addTask() }
@@ -420,9 +476,12 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
     }
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
-        guard isExpanded, displayedIndices.indices.contains(row) else { return nil }
+        guard isExpanded,
+              displayedRows.indices.contains(row),
+              case let .task(itemIndex) = displayedRows[row],
+              !store.items[itemIndex].isDone else { return nil }
         let item = NSPasteboardItem()
-        item.setString(String(displayedIndices[row]), forType: taskDragType)
+        item.setString(String(itemIndex), forType: taskDragType)
         return item
     }
 
@@ -432,7 +491,8 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         proposedRow row: Int,
         proposedDropOperation dropOperation: NSTableView.DropOperation
     ) -> NSDragOperation {
-        guard isExpanded else { return [] }
+        let completedHeaderRow = displayedRows.firstIndex(of: .completedHeader) ?? displayedRows.count
+        guard isExpanded, row <= completedHeaderRow else { return [] }
         tableView.setDropRow(row, dropOperation: .above)
         return .move
     }
@@ -446,13 +506,18 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         guard isExpanded,
               let value = info.draggingPasteboard.string(forType: taskDragType),
               let source = Int(value),
-              store.items.indices.contains(source) else { return false }
-        var destination = min(max(row, 0), store.items.count)
-        if source < destination { destination -= 1 }
-        guard destination != source else { return false }
+              store.items.indices.contains(source),
+              !store.items[source].isDone else { return false }
+        var unfinished = store.items.filter { !$0.isDone }
+        let completed = store.items.filter(\.isDone)
+        guard let sourcePosition = unfinished.firstIndex(where: { $0.id == store.items[source].id }) else { return false }
+        var destination = min(max(row, 0), unfinished.count)
+        if sourcePosition < destination { destination -= 1 }
+        guard destination != sourcePosition else { return false }
         rememberForUndo()
-        let moved = store.items.remove(at: source)
-        store.items.insert(moved, at: destination)
+        let moved = unfinished.remove(at: sourcePosition)
+        unfinished.insert(moved, at: destination)
+        store.items = unfinished + completed
         changed()
         return true
     }
@@ -488,6 +553,15 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
 
     @objc private func toggleBacklog() {
         isExpanded.toggle()
+        isCompletedExpanded = false
+        editingIndex = nil
+        table.reloadData()
+        updateCount()
+    }
+
+    @objc private func toggleCompleted() {
+        isCompletedExpanded.toggle()
+        editingIndex = nil
         table.reloadData()
         updateCount()
     }
@@ -497,7 +571,7 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         editingIndex = sender.tag
         table.reloadData()
         DispatchQueue.main.async {
-            guard let displayRow = self.displayedIndices.firstIndex(of: sender.tag),
+            guard let displayRow = self.displayedRows.firstIndex(of: .task(sender.tag)),
                   let cell = self.table.view(atColumn: 0, row: displayRow, makeIfNecessary: false),
                   let editor = self.findInlineEditor(in: cell) else { return }
             self.view.window?.makeFirstResponder(editor)
@@ -525,9 +599,12 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
     }
 
     @objc private func moveTaskUp(_ sender: NSButton) {
-        guard store.items.indices.contains(sender.tag), sender.tag > 0 else { return }
+        guard store.items.indices.contains(sender.tag),
+              !store.items[sender.tag].isDone else { return }
+        let unfinishedIndices = store.items.indices.filter { !store.items[$0].isDone }
+        guard let position = unfinishedIndices.firstIndex(of: sender.tag), position > 0 else { return }
         rememberForUndo()
-        store.items.swapAt(sender.tag, sender.tag - 1)
+        store.items.swapAt(sender.tag, unfinishedIndices[position - 1])
         changed()
     }
 
@@ -564,12 +641,21 @@ final class TodoViewController: NSViewController, NSTableViewDataSource, NSTable
         let remaining = store.items.filter { !$0.isDone }.count
         countLabel.stringValue = remaining == 1 ? "1 step left" : "\(remaining) steps left"
         let later = max(remaining - 1, 0)
-        backlogButton.title = isExpanded ? "Hide backlog" : (later == 1 ? "Show 1 later" : "Show \(later) later")
-        backlogButton.isHidden = remaining <= 1
+        let completed = store.items.filter(\.isDone).count
+        if isExpanded {
+            backlogButton.title = "Hide backlog"
+        } else if later == 1 {
+            backlogButton.title = "Show 1 later"
+        } else if later > 1 {
+            backlogButton.title = "Show \(later) later"
+        } else {
+            backlogButton.title = "Show backlog"
+        }
+        backlogButton.isHidden = later == 0 && completed == 0
         emptyLabel.stringValue = store.items.isEmpty
             ? "Nothing pulling at your attention.\nAdd one small next step."
             : "Session complete.\nTake a breath before adding more."
-        emptyLabel.isHidden = !displayedIndices.isEmpty
+        emptyLabel.isHidden = !displayedRows.isEmpty
     }
 
     func focusInput() {
