@@ -2,12 +2,15 @@
 set -euo pipefail
 
 ROOT="${0:A:h}"
-APP="$ROOT/outputs/Session Todo.app"
+OUTPUT_APP="$ROOT/outputs/Session Todo.app"
+STAGING_DIR="$(mktemp -d "${TMPDIR:-/tmp}/session-todo-build.XXXXXX")"
+trap 'rm -rf "$STAGING_DIR"' EXIT
+
+APP="$STAGING_DIR/Session Todo.app"
 CONTENTS="$APP/Contents"
 
-# Always assemble a fresh bundle. Reusing an app that Finder has touched can
-# leave metadata behind that ad-hoc signing correctly refuses to accept.
-rm -rf "$APP"
+# Assemble away from synced folders, which can attach Finder/File Provider
+# metadata while the bundle is still being signed.
 mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources"
 mkdir -p "$ROOT/.cache/clang"
 CLANG_MODULE_CACHE_PATH="$ROOT/.cache/clang" \
@@ -37,4 +40,14 @@ PLIST
 
 xattr -cr "$APP"
 codesign --force --deep --sign - "$APP"
-echo "$APP"
+codesign --verify --deep --strict "$APP"
+
+rm -rf "$OUTPUT_APP"
+mkdir -p "$ROOT/outputs"
+ditto --noextattr "$APP" "$OUTPUT_APP"
+xattr -cr "$OUTPUT_APP"
+for attribute in com.apple.FinderInfo com.apple.ResourceFork com.apple.fileprovider.fpfs#P; do
+  xattr -d "$attribute" "$OUTPUT_APP" 2>/dev/null || true
+done
+codesign --verify --deep --strict "$OUTPUT_APP"
+echo "$OUTPUT_APP"
