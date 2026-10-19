@@ -30,13 +30,20 @@ jobs:
         with:
           ref: ${{ inputs.tag || github.ref_name }}
 
+      # Packaging scripts come from this workflow's commit, so older tags
+      # that predate them can still be repackaged.
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          path: release-tools
+
       - name: Build universal app
         run: VERSION="${TAG#v}" ./build.sh --universal
 
       - name: Package
         run: |
           ditto -c -k --keepParent "outputs/Session Todo.app" "$ZIP"
-          ./make-dmg.sh "$DMG"
+          release-tools/make-dmg.sh "outputs/Session Todo.app" "$DMG"
           shasum -a 256 "$ZIP" "$DMG" > SHA256SUMS.txt
           cat SHA256SUMS.txt
 

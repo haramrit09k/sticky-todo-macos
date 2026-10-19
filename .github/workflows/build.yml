@@ -21,7 +21,7 @@ jobs:
           [[ "$archs" == *arm64* && "$archs" == *x86_64* ]]
 
       - name: Package disk image
-        run: ./make-dmg.sh Session-Todo-macOS.dmg
+        run: ./make-dmg.sh "outputs/Session Todo.app" Session-Todo-macOS.dmg
 
       - name: Launch smoke test
         run: |
