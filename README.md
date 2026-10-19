@@ -72,7 +72,7 @@ I do not have a paid Apple Developer account, so the app is not notarized by App
 
 <img src="Assets/gatekeeper-open-anyway.webp" width="600" alt="System Settings, Privacy and Security: the “Session Todo.app was blocked” message with an Open Anyway button, and the follow-up dialog offering Move to Trash, Open Anyway, or Done">
 
-*What steps 4 and 5 look like on macOS 15. Use either **Open Anyway** button; never “Move to Trash.”*
+*What steps 4 and 5 look like on a recent macOS. Use either **Open Anyway** button; never “Move to Trash.”*
 
 You only need to do this once. On macOS 13 and 14 you can also right-click the app, choose **Open**, then **Open** again.
 
