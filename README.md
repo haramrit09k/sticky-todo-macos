@@ -7,6 +7,10 @@
 ![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
 [![MIT License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
+<img src="Assets/screenshot-main.webp" width="560" alt="Session Todo floating over the desktop: one task marked NOW, an input for the next small step, and six more tasks tucked away under Show 6 later">
+
+*One task marked **NOW**, everything else tucked away under “Show 6 later.”*
+
 ## TL;DR — try it
 
 ### [⬇ Download Session Todo for Mac](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)
