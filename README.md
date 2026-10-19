@@ -9,13 +9,17 @@
 
 ## TL;DR — try it
 
-On any Mac running macOS 13 or newer (Apple Silicon or Intel), paste this into Terminal:
+### [⬇ Download Session Todo for Mac](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)
+
+Works on any Mac with macOS 13 or newer, Apple Silicon or Intel. Open the DMG, drag **Session Todo** into **Applications**, and open it. Press `⌘⇧Space` anytime to hide or bring it back.
+
+The first time, macOS will block it because I have not paid for Apple's notarization. Go to **System Settings → Privacy & Security** and click **Open Anyway**. You only do this once. [More detail →](#download-and-install)
+
+Prefer Terminal? This installs it without the security prompt:
 
 ```bash
 curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip && ditto -x -k /tmp/Session-Todo.zip /Applications && open "/Applications/Session Todo.app"
 ```
-
-That downloads the latest release, puts it in `/Applications`, and opens it. Press `⌘⇧Space` anytime to hide or bring it back. Prefer clicking? See [Download and install](#download-and-install).
 
 **Quick start:** add one small task, work from the card marked **NOW**, and check it off when you are done. [See the short usage guide →](#how-to-use-it)
 
@@ -54,27 +58,21 @@ There are intentionally no projects, labels, due dates, streaks, productivity sc
 
 ## Download and install
 
-Every [release](https://github.com/haramrit09k/sticky-todo-macos/releases/latest) includes `Session-Todo-macOS.zip`, a single universal build that runs on every Mac with macOS 13 or newer, Apple Silicon (M1 and later) and Intel alike.
+Every [release](https://github.com/haramrit09k/sticky-todo-macos/releases/latest) includes a disk image (`Session-Todo-macOS.dmg`) and a zip (`Session-Todo-macOS.zip`) of the same app. It is a single universal build that runs on every Mac with macOS 13 or newer, Apple Silicon (M1 and later) and Intel alike.
 
 I do not have a paid Apple Developer account, so the app is not notarized by Apple. macOS will refuse to open it the first time, with a message like *“Apple could not verify ‘Session Todo’ is free of malware.”* That is expected. The app is built in the open by [GitHub Actions](.github/workflows/release.yml) from the code in this repo.
 
-### Option A: Terminal (no security prompt)
+### Option A: Download the DMG
 
-```bash
-curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip
-ditto -x -k /tmp/Session-Todo.zip /Applications
-open "/Applications/Session Todo.app"
-```
+1. Download **[Session-Todo-macOS.dmg](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)**.
+2. Open it and drag **Session Todo** onto the **Applications** shortcut next to it.
+3. Open Session Todo from Applications. macOS will block it the first time. Click **Done** (not “Move to Trash”).
+4. Open **System Settings → Privacy & Security** and scroll down to **“Session Todo.app” was blocked to protect your Mac**. Click **Open Anyway** next to it.
+5. macOS asks one more time. Click **Open Anyway** (not “Move to Trash”), then confirm with your password or Touch ID.
 
-Files downloaded with `curl` are not marked as “from the internet,” so macOS opens the app without the warning.
+<img src="Assets/gatekeeper-open-anyway.webp" width="600" alt="System Settings, Privacy and Security: the “Session Todo.app was blocked” message with an Open Anyway button, and the follow-up dialog offering Move to Trash, Open Anyway, or Done">
 
-### Option B: Browser download
-
-1. Download **Session-Todo-macOS.zip** from the [latest release](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip).
-2. Double-click the zip if your browser did not unzip it already.
-3. Drag **Session Todo.app** into your **Applications** folder.
-4. Open it. macOS will block it the first time. Click **Done** (not “Move to Trash”).
-5. Open **System Settings → Privacy & Security**, scroll down to the message about Session Todo, and click **Open Anyway**. Confirm with your password or Touch ID.
+*What steps 4 and 5 look like on a recent macOS. Use either **Open Anyway** button; never “Move to Trash.”*
 
 You only need to do this once. On macOS 13 and 14 you can also right-click the app, choose **Open**, then **Open** again.
 
@@ -83,6 +81,16 @@ If macOS says the app is “damaged and can’t be opened,” clear the download
 ```bash
 xattr -dr com.apple.quarantine "/Applications/Session Todo.app"
 ```
+
+### Option B: Terminal (no security prompt)
+
+```bash
+curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip
+ditto -x -k /tmp/Session-Todo.zip /Applications
+open "/Applications/Session Todo.app"
+```
+
+Files downloaded with `curl` are not marked as “from the internet,” so macOS opens the app without the warning.
 
 ### No admin rights?
 
@@ -175,7 +183,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Creating a release with a new `v*` tag on GitHub's Releases page works too. The [release workflow](.github/workflows/release.yml) builds the universal app on a macOS runner, zips it as `Session-Todo-macOS.zip` with a SHA-256 checksum, and attaches both to the release. To rebuild the downloads for an existing release, open **Actions → Release → Run workflow** and enter its tag. Every push and pull request also runs a [build check](.github/workflows/build.yml).
+Creating a release with a new `v*` tag on GitHub's Releases page works too. The [release workflow](.github/workflows/release.yml) builds the universal app on a macOS runner, packages it as `Session-Todo-macOS.dmg` and `Session-Todo-macOS.zip` with SHA-256 checksums, and attaches them to the release. To rebuild the downloads for an existing release, open **Actions → Release → Run workflow** and enter its tag. Every push and pull request also runs a [build check](.github/workflows/build.yml).
 
 The app uses:
 

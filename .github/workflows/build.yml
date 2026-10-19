@@ -20,6 +20,9 @@ jobs:
           echo "Architectures: $archs"
           [[ "$archs" == *arm64* && "$archs" == *x86_64* ]]
 
+      - name: Package disk image
+        run: ./make-dmg.sh "outputs/Session Todo.app" Session-Todo-macOS.dmg
+
       - name: Launch smoke test
         run: |
           "outputs/Session Todo.app/Contents/MacOS/SessionTodo" &
