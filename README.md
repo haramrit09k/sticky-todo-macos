@@ -9,13 +9,13 @@
 
 ## TL;DR — try it
 
-On a Mac running macOS 13 or newer (Apple Silicon or Intel):
+On any Mac running macOS 13 or newer (Apple Silicon or Intel), paste this into Terminal:
 
 ```bash
-git clone https://github.com/haramrit09k/sticky-todo-macos.git && cd sticky-todo-macos && ./install.sh
+curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip && ditto -x -k /tmp/Session-Todo.zip /Applications && open "/Applications/Session Todo.app"
 ```
 
-That builds the app locally, puts it in `/Applications`, and opens it. Press `⌘⇧Space` anytime to hide or bring it back.
+That downloads the latest release, puts it in `/Applications`, and opens it. Press `⌘⇧Space` anytime to hide or bring it back. Prefer clicking? See [Download and install](#download-and-install).
 
 **Quick start:** add one small task, work from the card marked **NOW**, and check it off when you are done. [See the short usage guide →](#how-to-use-it)
 
@@ -52,9 +52,54 @@ This app leaves the answer one shortcut away.
 
 There are intentionally no projects, labels, due dates, streaks, productivity scores, or dashboards.
 
-## Install
+## Download and install
 
-For now, Session Todo is built from source. You need macOS 13 or newer and Xcode Command Line Tools.
+Every [release](https://github.com/haramrit09k/sticky-todo-macos/releases/latest) includes `Session-Todo-macOS.zip`, a single universal build that runs on every Mac with macOS 13 or newer, Apple Silicon (M1 and later) and Intel alike.
+
+I do not have a paid Apple Developer account, so the app is not notarized by Apple. macOS will refuse to open it the first time, with a message like *“Apple could not verify ‘Session Todo’ is free of malware.”* That is expected. The app is built in the open by [GitHub Actions](.github/workflows/release.yml) from the code in this repo.
+
+### Option A: Terminal (no security prompt)
+
+```bash
+curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip
+ditto -x -k /tmp/Session-Todo.zip /Applications
+open "/Applications/Session Todo.app"
+```
+
+Files downloaded with `curl` are not marked as “from the internet,” so macOS opens the app without the warning.
+
+### Option B: Browser download
+
+1. Download **Session-Todo-macOS.zip** from the [latest release](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip).
+2. Double-click the zip if your browser did not unzip it already.
+3. Drag **Session Todo.app** into your **Applications** folder.
+4. Open it. macOS will block it the first time. Click **Done** (not “Move to Trash”).
+5. Open **System Settings → Privacy & Security**, scroll down to the message about Session Todo, and click **Open Anyway**. Confirm with your password or Touch ID.
+
+You only need to do this once. On macOS 13 and 14 you can also right-click the app, choose **Open**, then **Open** again.
+
+If macOS says the app is “damaged and can’t be opened,” clear the download flag and try again:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Session Todo.app"
+```
+
+### No admin rights?
+
+If you cannot write to `/Applications` (common on work Macs), use your personal Applications folder instead:
+
+```bash
+mkdir -p ~/Applications
+curl -fsSL -o /tmp/Session-Todo.zip https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.zip
+ditto -x -k /tmp/Session-Todo.zip ~/Applications
+open ~/Applications/"Session Todo.app"
+```
+
+Some company-managed Macs block apps that are not notarized entirely. If so, ask your IT team.
+
+## Build from source
+
+You need macOS 13.5 or newer and Xcode 15 (or its Command Line Tools) or later.
 
 If you do not have the command-line tools yet:
 
@@ -67,7 +112,6 @@ Then clone and install the app:
 ```bash
 git clone https://github.com/haramrit09k/sticky-todo-macos.git
 cd sticky-todo-macos
-chmod +x build.sh install.sh
 ./install.sh
 ```
 
@@ -80,7 +124,7 @@ If you would rather not install it yet:
 open "outputs/Session Todo.app"
 ```
 
-The build script compiles for the Mac it runs on, so it works on both Apple Silicon and Intel Macs. I have not packaged or notarized a downloadable universal release yet.
+`./build.sh` compiles for your Mac's chip. `./build.sh --universal` builds one app for both Apple Silicon and Intel, which is what the releases use.
 
 ## How to use it
 
@@ -121,6 +165,17 @@ This is a deliberately small native Swift/AppKit app. There are no third-party d
 ```
 
 The main code is in `Sources/SessionTodo/main.swift`. The build script compiles it with `swiftc`, creates the `.app` bundle in `outputs/`, and applies an ad-hoc signature.
+
+### Publishing a release
+
+Push a version tag and GitHub Actions does the rest:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The [release workflow](.github/workflows/release.yml) builds the universal app on a macOS runner, zips it as `Session-Todo-macOS.zip` with a SHA-256 checksum, and attaches both to a new GitHub release. Every push and pull request also runs a [build check](.github/workflows/build.yml).
 
 The app uses:
 

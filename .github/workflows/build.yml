@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build universal app
+        run: ./build.sh --universal
+
+      - name: Check both chips are included
+        run: |
+          archs="$(lipo -archs "outputs/Session Todo.app/Contents/MacOS/SessionTodo")"
+          echo "Architectures: $archs"
+          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]]
+
+      - name: Launch smoke test
+        run: |
+          "outputs/Session Todo.app/Contents/MacOS/SessionTodo" &
+          pid=$!
+          sleep 5
+          kill -0 "$pid"
+          kill "$pid"

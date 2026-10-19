@@ -1,0 +1,42 @@
+name: Release
+
+# Push a version tag to publish a downloadable build:
+#   git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      ASSET: Session-Todo-macOS.zip
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build universal app
+        run: VERSION="${GITHUB_REF_NAME#v}" ./build.sh --universal
+
+      - name: Package
+        run: |
+          ditto -c -k --keepParent "outputs/Session Todo.app" "$ASSET"
+          shasum -a 256 "$ASSET" > "$ASSET.sha256"
+          cat "$ASSET.sha256"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<'NOTES'
+          Universal build: runs on Apple Silicon and Intel Macs with macOS 13 or newer.
+
+          This build is not notarized by Apple, so macOS will block it the first time.
+          See [Download and install](https://github.com/${{ github.repository }}#download-and-install) for the one-time steps to open it.
+          NOTES
+          gh release create "$GITHUB_REF_NAME" "$ASSET" "$ASSET.sha256" \
+            --title "Session Todo $GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --generate-notes
