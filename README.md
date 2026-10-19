@@ -67,7 +67,12 @@ I do not have a paid Apple Developer account, so the app is not notarized by App
 1. Download **[Session-Todo-macOS.dmg](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)**.
 2. Open it and drag **Session Todo** onto the **Applications** shortcut next to it.
 3. Open Session Todo from Applications. macOS will block it the first time. Click **Done** (not “Move to Trash”).
-4. Open **System Settings → Privacy & Security**, scroll down to the message about Session Todo, and click **Open Anyway**. Confirm with your password or Touch ID.
+4. Open **System Settings → Privacy & Security** and scroll down to **“Session Todo.app” was blocked to protect your Mac**. Click **Open Anyway** next to it.
+5. macOS asks one more time. Click **Open Anyway** (not “Move to Trash”), then confirm with your password or Touch ID.
+
+<img src="Assets/gatekeeper-open-anyway.webp" width="600" alt="System Settings, Privacy and Security: the “Session Todo.app was blocked” message with an Open Anyway button, and the follow-up dialog offering Move to Trash, Open Anyway, or Done">
+
+*What steps 4 and 5 look like on macOS 15. Use either **Open Anyway** button; never “Move to Trash.”*
 
 You only need to do this once. On macOS 13 and 14 you can also right-click the app, choose **Open**, then **Open** again.
 
