@@ -4,6 +4,8 @@ A small floating todo list for macOS that keeps the one thing you sat down to do
 
 [![Download for macOS](https://img.shields.io/badge/Download_for_macOS-DMG-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)
 
+[![Latest release](https://img.shields.io/github/v/release/haramrit09k/sticky-todo-macos)](https://github.com/haramrit09k/sticky-todo-macos/releases/latest)
+[![Build](https://github.com/haramrit09k/sticky-todo-macos/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/haramrit09k/sticky-todo-macos/actions/workflows/build.yml)
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift)
 ![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
