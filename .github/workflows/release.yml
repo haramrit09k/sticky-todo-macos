@@ -21,7 +21,8 @@ jobs:
   release:
     runs-on: macos-15
     env:
-      ASSET: Session-Todo-macOS.zip
+      ZIP: Session-Todo-macOS.zip
+      DMG: Session-Todo-macOS.dmg
       TAG: ${{ inputs.tag || github.ref_name }}
       GH_REPO: ${{ github.repository }}
     steps:
@@ -34,9 +35,10 @@ jobs:
 
       - name: Package
         run: |
-          ditto -c -k --keepParent "outputs/Session Todo.app" "$ASSET"
-          shasum -a 256 "$ASSET" > "$ASSET.sha256"
-          cat "$ASSET.sha256"
+          ditto -c -k --keepParent "outputs/Session Todo.app" "$ZIP"
+          ./make-dmg.sh "$DMG"
+          shasum -a 256 "$ZIP" "$DMG" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
 
       - name: Publish GitHub release
         env:
@@ -45,17 +47,18 @@ jobs:
           # A release created on GitHub's website already exists by the time
           # this runs, so attach the files to it instead of creating one.
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$ASSET" "$ASSET.sha256" --clobber
+            gh release upload "$TAG" "$DMG" "$ZIP" SHA256SUMS.txt --clobber
             exit 0
           fi
 
           cat > notes.md <<'NOTES'
+          Download **Session-Todo-macOS.dmg**, open it, and drag Session Todo into Applications.
           Universal build: runs on Apple Silicon and Intel Macs with macOS 13 or newer.
 
           This build is not notarized by Apple, so macOS will block it the first time.
           See [Download and install](https://github.com/${{ github.repository }}#download-and-install) for the one-time steps to open it.
           NOTES
-          gh release create "$TAG" "$ASSET" "$ASSET.sha256" \
+          gh release create "$TAG" "$DMG" "$ZIP" SHA256SUMS.txt \
             --title "Session Todo $TAG" \
             --notes-file notes.md \
             --generate-notes
