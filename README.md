@@ -1,21 +1,23 @@
-# Session Todo
+<h1><img src="Assets/AppIcon-readme.png" width="56" align="middle" alt=""> Session Todo</h1>
 
-<img src="Assets/AppIcon.png" width="120" alt="Sticky Todo app icon">
+A small floating todo list for macOS that keeps the one thing you sat down to do in front of you.
 
+[![Download for macOS](https://img.shields.io/badge/Download_for_macOS-DMG-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)
+
+[![Latest release](https://img.shields.io/github/v/release/haramrit09k/sticky-todo-macos)](https://github.com/haramrit09k/sticky-todo-macos/releases/latest)
+[![Build](https://github.com/haramrit09k/sticky-todo-macos/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/haramrit09k/sticky-todo-macos/actions/workflows/build.yml)
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift)
 ![Apple Silicon and Intel](https://img.shields.io/badge/architecture-Apple%20Silicon%20%7C%20Intel-blue)
 [![MIT License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
-<img src="Assets/screenshot-main.webp" width="560" alt="Session Todo floating over the desktop: one task marked NOW, an input for the next small step, and six more tasks tucked away under Show 6 later">
+<img src="Assets/screenshot-main.webp" width="480" alt="Session Todo floating over the desktop: one task marked NOW, an input for the next small step, and six more tasks tucked away under Show 6 later">
 
 *One task marked **NOW**, everything else tucked away under “Show 6 later.”*
 
 ## TL;DR — try it
 
-### [⬇ Download Session Todo for Mac](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg)
-
-Works on any Mac with macOS 13 or newer, Apple Silicon or Intel. Open the DMG, drag **Session Todo** into **Applications**, and open it. Press `⌘⇧Space` anytime to hide or bring it back.
+[Download the DMG](https://github.com/haramrit09k/sticky-todo-macos/releases/latest/download/Session-Todo-macOS.dmg), open it, drag **Session Todo** into **Applications**, and open it. Works on any Mac with macOS 13 or newer, Apple Silicon or Intel. Press `⌘⇧Space` anytime to hide or bring it back.
 
 The first time, macOS will block it because I have not paid for Apple's notarization. Go to **System Settings → Privacy & Security** and click **Open Anyway**. You only do this once. [More detail →](#download-and-install)
 
