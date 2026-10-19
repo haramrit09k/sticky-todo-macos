@@ -1,10 +1,18 @@
 name: Release
 
-# Push a version tag to publish a downloadable build:
-#   git tag v1.0.0 && git push origin v1.0.0
+# Publish a downloadable build in either of these ways:
+#   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
+#   - Create a release on GitHub's Releases page with a new v* tag
+# To (re)attach downloads to an existing release, use "Run workflow" on the
+# Actions tab and enter its tag.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and attach downloads to (for example v1.0.0)
+        required: true
 
 permissions:
   contents: write
@@ -14,11 +22,15 @@ jobs:
     runs-on: macos-15
     env:
       ASSET: Session-Todo-macOS.zip
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
 
       - name: Build universal app
-        run: VERSION="${GITHUB_REF_NAME#v}" ./build.sh --universal
+        run: VERSION="${TAG#v}" ./build.sh --universal
 
       - name: Package
         run: |
@@ -30,13 +42,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # A release created on GitHub's website already exists by the time
+          # this runs, so attach the files to it instead of creating one.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ASSET" "$ASSET.sha256" --clobber
+            exit 0
+          fi
+
           cat > notes.md <<'NOTES'
           Universal build: runs on Apple Silicon and Intel Macs with macOS 13 or newer.
 
           This build is not notarized by Apple, so macOS will block it the first time.
           See [Download and install](https://github.com/${{ github.repository }}#download-and-install) for the one-time steps to open it.
           NOTES
-          gh release create "$GITHUB_REF_NAME" "$ASSET" "$ASSET.sha256" \
-            --title "Session Todo $GITHUB_REF_NAME" \
+          gh release create "$TAG" "$ASSET" "$ASSET.sha256" \
+            --title "Session Todo $TAG" \
             --notes-file notes.md \
             --generate-notes

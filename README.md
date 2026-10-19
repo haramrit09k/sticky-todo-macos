@@ -175,7 +175,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The [release workflow](.github/workflows/release.yml) builds the universal app on a macOS runner, zips it as `Session-Todo-macOS.zip` with a SHA-256 checksum, and attaches both to a new GitHub release. Every push and pull request also runs a [build check](.github/workflows/build.yml).
+Creating a release with a new `v*` tag on GitHub's Releases page works too. The [release workflow](.github/workflows/release.yml) builds the universal app on a macOS runner, zips it as `Session-Todo-macOS.zip` with a SHA-256 checksum, and attaches both to the release. To rebuild the downloads for an existing release, open **Actions → Release → Run workflow** and enter its tag. Every push and pull request also runs a [build check](.github/workflows/build.yml).
 
 The app uses:
 
